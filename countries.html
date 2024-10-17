@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>countries-html</title>
+</head>
+<style>
+    /* Your existing CSS styles */
+    #container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto;
+        gap: 20px;
+        height: auto;
+        text-align: center;
+    }
+
+    #container>div>img {
+        width: 100%;
+    }
+
+    #container>div {
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+            rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        height: 100%;
+    }
+
+    input {
+        padding: 10px 20px;
+        width: 20%;
+
+    }
+
+    #nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        background-color: aqua;
+        padding: 30px;
+    }
+
+    a {
+        font-weight: bold;
+        font-style: none;
+    }
+    select{
+        padding: 10px 20px;
+    }
+    #nav button{
+        padding: 10px 20px;
+    }
+    @media screen and (min-width:400px) and (max-width:900px) {
+        #container{
+            grid-template-columns: repeat(2,1Fr);
+            width: 80%;
+            margin: auto;
+        }
+    }
+    @media screen and (min-width:100px) and (max-width:700px) {
+        #container{
+            grid-template-columns: repeat(1,1Fr);
+            width: 70%;
+            margin: auto;
+        }
+    }
+</style>
+<body>
+    <select onchange="handleRegion()">
+        <option value="Americas">Americas</option>
+        <option value="Africa">Africa</option>
+        <option value="Asia">Asia</option>
+    </select> 
+
+    <select name="" id="" onchange="handleshort()">
+        <option value="HTL">High to Low</option>
+        <option value="LTH"> Low to High</option>
+    </select>
+
+    <div id="container"></div>
+    <script>
+        let data=[];
+        async function getdata() {
+            try {
+                let res = await fetch("https://restcountries.com/v3.1/all");
+                let out = await res.json();
+                console.log(out);
+                data=out;
+                displaydata(out); // Call displaydata function and pass fetched data
+            } catch (error) {
+                alert(error);
+            }
+        }
+        getdata();
+
+        function displaydata(out) {
+            document.querySelector("#container").innerHTML="";
+            out.forEach(element => {
+                let div = document.createElement("div");
+                let flag = document.createElement("img");
+                flag.src = element.flags.png; // Access flag URL correctly
+                let countryname = document.createElement("h2");
+                countryname.innerText = element.name.common;
+                let population = document.createElement("p");
+                population.innerText = "Population: " + element.population;
+                let region = document.createElement("p");
+                region.innerText = "Region: " + element.region;
+                let capital = document.createElement("p");
+                capital.innerText = "Capital: " + element.capital;
+                div.append(flag, countryname, population, region, capital);
+                document.querySelector("#container").append(div);
+            });
+        }
+
+function handleRegion(){
+    let selected=document.querySelector("select").value;
+  let filterdata=data.filter(function(element){
+    return element.region==selected;
+  });
+  displaydata(filterdata);
+  console.log(filterdata)
+};
+
+
+function handleshort() {
+    var selected = document.querySelector("select").value;
+    let filterdata = data.filter(function (element) {
+        return element.region === document.querySelector("select").value;
+    });
+
+    if (selected === "HTL") {
+        filterdata.sort((a, b) => b.population - a.population);
+        console.log(filterdata);
+    } else {
+        filterdata.sort((a, b) => a.population - b.population);
+        console.log(filterdata);
+    }
+    
+    displaydata(filterdata);
+}
+
+    </script>
+</body>
+
+</html>

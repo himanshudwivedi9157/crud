@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    * {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #cityInput {
+        width: 30%;
+        height: 40px;
+        border: none;
+    }
+
+    #btn {
+        height: 40px;
+        width: 7%;
+        border: none;
+        background-color: gray;
+        color: white;
+        font-size: large;
+    }
+
+    header {
+        text-align: center;
+        background-color: antiquewhite;
+        padding: 30px;
+    }
+
+    main {
+        display: flex;
+        width: 80%;
+        margin: auto;
+       padding: 20px;
+       background-color: aliceblue;
+    }
+
+    #weatherDetails {
+      background-color: aqua;
+        text-align: center;
+    
+    }
+    #heading{
+        color: gray;
+        text-align: center;
+        padding: 20px;
+    }
+    #temp{
+        font-size: 23px;
+        color: gray;
+        padding-bottom: 20px;
+        font-weight: bold;
+    }
+    #weatherDetails p {
+        padding: 20px;
+    }
+</style>
+
+<body>
+    <header>
+
+        <input type="text" id="cityInput" placeholder=" Enter city"><input type="submit" value="Submit" id="btn"
+            onclick="getWeather()">
+
+    </header>
+    <main>
+        <div id="weatherDetails">
+            <!-- Weather details will be displayed here -->
+        </div>
+        <div id="map">
+            <!-- <iframe
+  width="600"
+  height="450"
+  style="border:0"
+  loading="lazy"
+  allowfullscreen
+  referrerpolicy="no-referrer-when-downgrade"
+  src="https://www.google.com/maps/embed/v1/place?key=API_KEY
+    &q=Space+Needle,Seattle+WA">
+</iframe> -->
+        </div>
+    </main>
+    <div id="forecast">
+        <!-- Daily forecast for next 5 days will be displayed here -->
+      </div>
+
+</body>
+
+</html>
+
+<script>
+    async function getWeather() {
+        const city = document.getElementById('cityInput').value;
+        const apiKey = 'e63616ad01822ca799c31b487ce45f7f';
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            displayWeather(data);
+            displayMap(data.coord.lat, data.coord.lon);
+            displayForecast(data); // Call to display the forecast
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    function displayWeather(data) {
+        const weatherDetails = document.getElementById('weatherDetails');
+        const weatherContent = document.createElement('div');
+
+        const heading = document.createElement('h2');
+        heading.textContent = data.name;
+        heading.id = "heading";
+
+        const temp = document.createElement('p');
+        temp.textContent = `  ${data.main.temp}°C`;
+        temp.id="temp";
+
+        const minTemp = document.createElement('p');
+        minTemp.textContent = `Min Temp: ${data.main.temp_min}°C`;
+
+        const maxTemp = document.createElement('p');
+        maxTemp.textContent = `Max Temp: ${data.main.temp_max}°C`;
+
+        const windSpeed = document.createElement('p');
+        windSpeed.textContent = `Wind Speed:     ${data.wind.speed} m/s`;
+
+        const cloudiness = document.createElement('p');
+        cloudiness.textContent = `Cloudiness: ${data.clouds.all}%`;
+
+        const sunrise = document.createElement('p');
+        sunrise.textContent = `Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}`;
+
+        const sunset = document.createElement('p');
+        sunset.textContent = `Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`;
+
+        weatherContent.appendChild(heading);
+        weatherContent.appendChild(temp);
+        weatherContent.appendChild(minTemp);
+        weatherContent.appendChild(maxTemp);
+        weatherContent.appendChild(windSpeed);
+        weatherContent.appendChild(cloudiness);
+        weatherContent.appendChild(sunrise);
+        weatherContent.appendChild(sunset);
+
+        weatherDetails.innerHTML = '';
+        weatherDetails.appendChild(weatherContent);
+    }
+
+    function displayMap(lat, lon) {
+        const mapElement = document.getElementById('map');
+        const iframe = document.createElement('iframe');
+
+        iframe.setAttribute('width', '600');
+        iframe.setAttribute('height', '450');
+        iframe.setAttribute('style', 'border:0');
+        iframe.setAttribute('loading', 'lazy');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+        iframe.setAttribute('src', `https://www.google.com/maps/embed/v1/place?key=AIzaSyBNTcAXCsyXwOgmVLg4wJY2U2Pok2iMPP0&q=${lat},${lon}`);
+
+        mapElement.innerHTML = '';
+        mapElement.appendChild(iframe);
+    }
+
+    function displayForecast(data) {
+        const forecastElement = document.getElementById('forecast');
+        forecastElement.innerHTML = ''; // Clear previous forecast data
+
+        // Display forecast for next 5 days
+        for (let i = 0; i < data.list.length; i += 8) {
+            const forecast = data.list[i];
+            const forecastDate = new Date(forecast.dt * 1000);
+
+            const forecastItem = document.createElement('div');
+            forecastItem.classList.add('forecast-item');
+
+            const dateElement = document.createElement('p');
+            dateElement.textContent = forecastDate.toDateString();
+            forecastItem.appendChild(dateElement);
+
+            const tempElement = document.createElement('p');
+            tempElement.textContent = `Temperature: ${forecast.main.temp}°C`;
+            forecastItem.appendChild(tempElement);
+
+            forecastElement.appendChild(forecastItem);
+        }
+    }
+</script>

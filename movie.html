@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Search</title>
+  <style>
+    /* Your CSS styles here */
+    * {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: rgb(20, 20, 48);
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      
+    }
+
+    #searchInput {
+      width: 30%;
+      height: 50px;
+      border-radius: 5px 0px 0px 0px;
+      border: none;
+      font-size: x-large;
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+
+    #searchBtn {
+      width: 10%;
+      height: 50px;
+      background-color: aqua;
+      color: rgb(14, 1, 1);
+      border-radius: 0px 5px 0px 0px ; 
+      border: none;
+      font-size: x-large;
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+
+    #movieDetails {
+     
+      width: 40%;
+      background-color: white;
+      margin: auto;
+      text-align: center;
+      box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    margin-top: 5px;
+      border-radius: 0px 0px 5px 5px;
+    }
+
+  
+    #movieDetails>p{
+      text-align: justify;
+      padding: 20px;
+    }
+
+    #apologyGif {
+  /* Add your styles to modify the appearance of the apology GIF */
+  width: 100%;
+}
+   
+.recommended-tag {
+  color: green;
+  font-weight: bold;
+  font-size: 24px;
+  /* Add other styles as desired */
+}
+
+
+    /* Styles for screens smaller than 768px wide */
+@media screen and (max-width: 767px) and (min-width:120px){
+    /* Add your styles for small screens here */
+    body {
+        font-size: 14px; /* Example: Adjust font size for smaller screens */
+    }
+    #searchInput {
+      width: 70%;
+      height: 45px;
+      font-size: 14px;
+    }
+    #searchBtn{
+      width: 20%;
+      height: 45px;
+      font-size: 14px;
+    }
+    #movieDetails{
+      margin-top: 5px;
+      width: 90%;
+      margin: auto;
+    }
+    /* Other styles */
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Movie Search</h1>
+    <input type=" text" id="searchInput" placeholder=" Enter a movie title...">
+    <button id="searchBtn">Search</button>
+  </header>
+  <main id="movieDetails">
+    <!-- Movie details will be displayed here -->
+  </main>
+
+  <script>
+     // Your JavaScript code here
+     document.getElementById('searchBtn').addEventListener('click', () => {
+      const searchInput = document.getElementById('searchInput').value;
+      if (searchInput.trim() !== '') {
+        const apiKey = 'c0cdca64'; // Replace with your actual API key (without spaces)
+        const apiUrl = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(searchInput)}`;
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            displayMovieDetails(data);
+          })
+          .catch(error => {
+            console.error('Error fetching movie data:', error);
+          });
+      } else {
+        alert('Please enter a movie title.');
+      }
+    });
+
+    function displayMovieDetails(movieData) {
+      const movieDetailsContainer = document.getElementById('movieDetails');
+      movieDetailsContainer.innerHTML = ''; // Clear previous data
+      
+      if (movieData.Response === 'True') {
+        const poster = document.createElement('img');
+        poster.src = movieData.Poster;
+
+        const title = document.createElement('h2');
+        title.textContent = "Title: " + movieData.Title;
+
+        const releasedate = document.createElement('p');
+        releasedate.textContent = "Release Date: " + movieData.Released;
+
+        const rating = document.createElement('p');
+        rating.textContent = "Rating: " + movieData.Rated;
+
+        const plot = document.createElement('p');
+        plot.textContent = "Plot: " + movieData.Plot;
+
+        movieDetailsContainer.appendChild(poster);
+        movieDetailsContainer.appendChild(title);
+        movieDetailsContainer.appendChild(releasedate);
+        movieDetailsContainer.appendChild(rating);
+        movieDetailsContainer.appendChild(plot);
+        // Add more details as needed
+
+        const imdbRating = parseFloat(movieData.imdbRating);
+    if (imdbRating > 8.5) {
+      const recommendedTag = document.createElement('span');
+      recommendedTag.textContent = 'Recommended';
+      recommendedTag.classList.add('recommended-tag'); // Adding a class for styling
+      movieDetailsContainer.insertBefore(recommendedTag, title);
+    }
+
+
+      } else {
+        const errorMessage = document.createElement('img');
+        errorMessage.src = 'https://media.tenor.com/x9LQr6SDtMYAAAAC/apologize-sorry.gif';
+        errorMessage.alt = 'Apology GIF';
+        errorMessage.id = 'apologyGif';
+        movieDetailsContainer.appendChild(errorMessage);
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cart-page</title>
+</head>
+<style>
+    /* Your existing CSS styles */
+    #container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto;
+        gap: 20px;
+        height: auto;
+        text-align: center;
+    }
+
+    #container>div>img {
+        width: 100%;
+    }
+
+    #container>div {
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+            rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        height: 100%;
+    }
+
+    input {
+        padding: 10px 20px;
+        width: 20%;
+
+    }
+
+    #nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        background-color: aqua;
+        padding: 30px;
+    }
+
+    a {
+        font-weight: bold;
+        font-style: none;
+    }
+    #totalprice{
+        font-size: 24px;
+        padding: 30px;
+margin-top: 20px;
+        background-color: aqua;
+        text-align: center;
+    }
+</style>
+<body>
+   <div id="container"></div> 
+   <div id="totalprice"></div>
+</body>
+<script>
+    var cartitems=JSON.parse(localStorage.getItem("cartproducts"));
+    console.log(cartitems);
+    displaytable(cartitems);
+
+  // reduce method use for adding prices of items in cartitems array
+var totalprice = cartitems.reduce((acc, ele) => acc + ele.price, 0);
+var displayprice = document.querySelector("#totalprice");
+displayprice.innerText = "Total Price : " + totalprice;
+
+
+
+    function displaytable(data) {
+            const container = document.querySelector("#container");
+            container.innerHTML = ""; // Clear existing content in the container
+
+            data.forEach((product) => {
+                const div = document.createElement("div");
+                const imageDiv = document.createElement("img");
+                imageDiv.src = product.image;
+
+                const title = document.createElement("h2");
+                title.innerText = product.title;
+                title.style.backgroundColor = "red"; // Adjust styles here as needed
+
+                const price = document.createElement("h4");
+                price.innerText = "Price: " + product.price;
+
+                const description = document.createElement("p");
+                description.innerText = product.description;
+                description.style.textAlign = "justify";
+                description.style.padding = "20px";
+
+                const category = document.createElement("p");
+                category.innerText = product.category;
+
+                const rating = document.createElement("h6");
+                rating.innerText = "RATING: " + product.rating.rate;
+                rating.style.color = "red";
+
+          
+                div.append(imageDiv, title, price, description, category, rating);
+                container.appendChild(div);
+            });
+        }
+</script>
+</html>

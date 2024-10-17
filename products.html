@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        /* Your existing CSS styles */
+        #container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 20px;
+            height: auto;
+            text-align: center;
+        }
+
+        #container>div>img {
+            width: 100%;
+        }
+
+        #container>div {
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+                rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+            height: 100%;
+        }
+
+        input {
+            padding: 10px 20px;
+            width: 20%;
+
+        }
+
+        #nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background-color: aqua;
+            padding: 30px;
+        }
+
+        a {
+            font-weight: bold;
+            font-style: none;
+        }
+        select{
+            padding: 10px 20px;
+        }
+        #nav button{
+            padding: 10px 20px;
+        }
+        #addToCartButton{
+            background-color: rebeccapurple;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            margin: 20px;
+        }
+        #addToCartnav{
+            background-color: aqua;
+            border: none;
+           font-style: none;
+         
+        }
+        #addToCartnav>a{
+            /* background-color: antiquewhite; */
+            padding: 10px 20px;
+            display: flex;
+            width: 70px;
+            justify-content: space-between;
+            height: 100%;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            align-items: center;
+        }
+
+       /* Between 400px and 700px wide screens */
+@media screen and (min-width: 400px) and (max-width: 700px) {
+    #container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    #nav {
+        /* Adjust styles for smaller screens */
+        padding: 20px; /* For example, reduce padding */
+    }
+
+    #nav a {
+        /* Adjust individual link styles */
+        font-size: 14px; /* For example, reduce font size */
+    }
+}
+
+/* Between 199px and 399px wide screens */
+@media screen and (min-width: 199px) and (max-width: 399px) {
+    #container {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: auto;
+    }
+    #nav {
+        /* Adjust styles for even smaller screens */
+        padding: 10px; /* For example, further reduce padding */
+    }
+
+    #nav a {
+        /* Further adjustments for individual links */
+        font-size: 12px; /* For example, reduce font size more */
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <div id="nav">
+        <input oninput="search()" type="text" placeholder="Search for Products, Brands and More">
+        <select name="" id="" onchange="handleshort()">
+            <option value="HTL">High to Low</option>
+            <option value="LTH"> Low to High</option>
+        </select>
+        <a href="/">Men's</a>
+        <a href="/">Women's</a>
+        <a href="/">Jewelery</a>
+        <a href="/">Electronics</a>
+        <button id="addToCartnav"> <a  href="cart.html">Cart<img src="img/header_cart-eed150.svg" alt=""></a> </button>
+
+    </div>
+
+    <div id="container"></div>
+
+    <script>
+        let bag = [];
+        let cartItems = JSON.parse(localStorage.getItem("cartproducts")) || [];
+        // Fetching products from API
+        fetch("https://fakestoreapi.com/products")
+            .then((res) => res.json())
+            .then((data) => {
+                bag = data;
+                displaytable(data);
+            });
+
+        // for sort method
+
+        function handleshort() {
+            var selected = document.querySelector("select").value;
+            if (selected == "HTL") {
+                bag.sort((a, b) => b.price - a.price);
+                console.log(bag)
+            }
+            else {
+                bag.sort((a, b) => a.price - b.price);
+                console.log(bag)
+            }
+            displaytable(bag)
+        }
+
+
+        
+        function search() {
+            var searchdata = document.querySelector("input").value;
+            var newdata = bag.filter(function (elem) {
+                return elem.category.toLowerCase().includes(searchdata.toLowerCase());
+            });
+            displaytable(newdata);
+        }
+
+        function addToCart(product) {
+            let cartItems = JSON.parse(localStorage.getItem("cartproducts")) || [];
+            cartItems.push(product);
+            localStorage.setItem("cartproducts", JSON.stringify(cartItems));
+            alert("Item added to cart");
+        }
+
+        function displaytable(data) {
+            const container = document.querySelector("#container");
+            container.innerHTML = ""; // Clear existing content in the container
+
+            data.forEach((product) => {
+                const div = document.createElement("div");
+                const imageDiv = document.createElement("img");
+                imageDiv.src = product.image;
+
+                const title = document.createElement("h2");
+                title.innerText = product.title;
+                title.style.backgroundColor = "red"; // Adjust styles here as needed
+
+                const price = document.createElement("h4");
+                price.innerText = "Price: " + product.price;
+
+                const description = document.createElement("p");
+                description.innerText = product.description;
+                description.style.textAlign = "justify";
+                description.style.padding = "20px";
+
+                const category = document.createElement("p");
+                category.innerText = product.category;
+
+                const rating = document.createElement("h6");
+                rating.innerText = "RATING: " + product.rating.rate;
+                rating.style.color = "red";
+
+                const addToCartBtn = document.createElement("button");
+                addToCartBtn.innerText = "Add To Cart";
+                addToCartBtn.id = "addToCartButton";
+                // addToCartBtn.style.backgroundColor = "lightblue";
+                // addToCartBtn.style.border = "none";
+                // addToCartBtn.style.padding = "10px 20px";
+                // addToCartBtn.style.borderRadius = "5px";
+                addToCartBtn.addEventListener("click", function () {
+                    addToCart(product);
+                });
+
+                div.append(imageDiv, title, price, description, category, rating, addToCartBtn);
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+
+</html>
+
